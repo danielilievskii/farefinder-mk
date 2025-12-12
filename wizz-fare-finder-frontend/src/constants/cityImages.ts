@@ -3,6 +3,7 @@ import bariImage from '@/assets/cities/bari.jpg';
 import berlinImage from '@/assets/cities/berlin.jpg';
 import bolognaImage from '@/assets/cities/bologna.jpg';
 import bratislavaImage from '@/assets/cities/bratislava.jpg';
+import barcelonaImage from '@/assets/cities/barcelona.jpg';
 import brusselsImage from '@/assets/cities/brussels.jpg';
 import dortmundImage from '@/assets/cities/dortmund.jpg';
 import eindHovenImage from '@/assets/cities/eindhoven.jpg';
@@ -37,6 +38,7 @@ export const CITY_IMAGES: Record<string, string> = {
   bologna: bolognaImage,
   brussels: brusselsImage,
   bratislava: bratislavaImage,
+  barcelona: barcelonaImage,
   dortmund: dortmundImage,
   eindhoven: eindHovenImage,
   frankfurt: frankfurtImage,
