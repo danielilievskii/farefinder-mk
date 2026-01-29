@@ -35,9 +35,9 @@ const DestinationCard: React.FC<DestinationGroupProps> = ({
       <Card className="bg-gradient-card shadow-card hover:shadow-flight transition-shadow duration-300">
         <CollapsibleTrigger className="w-full">
           <CardHeader className="hover:bg-muted/10 transition-colors">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
               <div
-                className="w-64 h-32 flex-shrink-0 rounded-md bg-cover bg-center"
+                className="w-full sm:w-64 h-32 flex-shrink-0 rounded-md bg-cover bg-center"
                 style={{backgroundImage: `url(${getCityImage(destination)})`}}
               />
 

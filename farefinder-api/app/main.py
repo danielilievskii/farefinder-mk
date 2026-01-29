@@ -107,7 +107,7 @@ app = FastAPI(lifespan=lifespan)
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://wizzfarefinder.vercel.app"],
+    allow_origins=["https://farefindermk.vercel.app"],
     allow_origin_regex=r"https://wizz-fare-finder-.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],

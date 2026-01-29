@@ -23,11 +23,11 @@ const FlightCard: React.FC<FlightCardProps> = ({ flight }) => {
   return (
     <Card className="bg-muted/20 border-muted">
       <CardContent className="p-4">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <FlightLegDisplay leg={flight.outbound} type="outbound" />
           <FlightLegDisplay leg={flight.return} type="return" />
 
-          <div className="space-y-2 lg:text-right">
+          <div className="space-y-2 sm:text-right">
             <h4 className="font-semibold text-sm">Total Price</h4>
             <div className="space-y-1">
               <div className="text-xl font-bold text-primary">
@@ -45,7 +45,7 @@ const FlightCard: React.FC<FlightCardProps> = ({ flight }) => {
           </div>
         </div>
 
-        <div className="flex flex-row gap-2 justify-end mt-4">
+        <div className="flex flex-col sm:flex-row gap-2 justify-end mt-4">
           {isSameAirport ? (
             <BookingButton
               href={buildWizzAirTicketsUrl(flight, "roundtrip")}
