@@ -7,7 +7,15 @@ from dateutil.relativedelta import relativedelta
 from aiohttp.client_exceptions import ContentTypeError
 
 from app.service.data_utils import get_airport_codes, get_nearby_airports
-from app.core.config import WIZZ_AIR_BUILDNUMBER_URL
+from app.core.config import WIZZ_AIR_BUILDNUMBER_URL, WIZZ_AIR_HOME_URL
+
+import re
+import shutil
+import tempfile
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 async def main():
@@ -118,9 +126,49 @@ async def process_airport(base_url, code, name, generated_dates, nearby_airports
 
 
 def get_base_url():
-    res = requests.get(WIZZ_AIR_BUILDNUMBER_URL)
-    backend_url = res.text.split(" ")[1]
-    return f'{backend_url}/Api/search/timetable'
+    user_data_dir = tempfile.mkdtemp(prefix="chrome-user-data-")
+
+    options = Options()
+
+    options.binary_location = "/usr/bin/google-chrome"  # updated path
+    options.add_argument("--headless=new")  # REQUIRED
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+
+    service = Service("/usr/local/bin/chromedriver")  # updated path
+
+    driver = None
+
+    try:
+        driver = webdriver.Chrome(service=service, options=options)
+
+        driver.get(WIZZ_AIR_HOME_URL)
+
+        WebDriverWait(driver, 40).until(
+            lambda d: "apiUrl" in d.page_source or "Human Verification" in d.page_source
+        )
+
+        html = driver.page_source
+
+        if "Human Verification" in html:
+            raise Exception("Blocked by Wizz Air / AWS WAF human verification")
+
+        match = re.search(r'apiUrl\s*:\s*"([^"]+)"', html)
+
+        if not match:
+            raise Exception("Wizz Air apiUrl not found in page source")
+
+        api_base_url = match.group(1).rstrip("/")
+
+        return f"{api_base_url}/search/timetable"
+
+    finally:
+        if driver:
+            driver.quit()
+
+        shutil.rmtree(user_data_dir, ignore_errors=True)
 
 
 

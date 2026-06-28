@@ -14,3 +14,4 @@ if not DATABASE_URL:  # dev
     DATABASE_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db_name}"
 
 WIZZ_AIR_BUILDNUMBER_URL = "https://www.wizzair.com/buildnumber"
+WIZZ_AIR_HOME_URL = "https://www.wizzair.com/en-gb"
