@@ -1,4 +1,4 @@
-export const API_BASE = 'https://wizz-scraper.onrender.com';
+export const API_BASE = 'https://farefinder-mk-1.onrender.com';
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | string []>;
