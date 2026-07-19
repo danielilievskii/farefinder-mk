@@ -13,6 +13,7 @@ import re
 import shutil
 import tempfile
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -131,11 +132,12 @@ def get_base_url():
     options = Options()
 
     options.binary_location = "/usr/bin/google-chrome"  # updated path
-    options.add_argument("--headless=new")  # REQUIRED
+    # options.add_argument("--headless=new")  # REQUIRED
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
+    options.add_argument(f"--user-data-dir={user_data_dir}")
 
     service = Service("/usr/local/bin/chromedriver")  # updated path
 
@@ -143,17 +145,33 @@ def get_base_url():
 
     try:
         driver = webdriver.Chrome(service=service, options=options)
+        driver.set_page_load_timeout(60)
 
         driver.get(WIZZ_AIR_HOME_URL)
 
-        WebDriverWait(driver, 40).until(
-            lambda d: "apiUrl" in d.page_source or "Human Verification" in d.page_source
-        )
+        try:
+            # A WAF silent challenge can briefly display "Human Verification"
+            # before redirecting to the requested page. Wait for the application
+            # configuration instead of treating the challenge as an immediate
+            # terminal result.
+            WebDriverWait(driver, 60, poll_frequency=1).until(
+                lambda d: re.search(r'apiUrl\s*:\s*"[^"]+"', d.page_source)
+            )
+        except TimeoutException as exc:
+            html = driver.page_source
+
+            if "Human Verification" in html:
+                raise Exception(
+                    "Wizz Air / AWS WAF human verification did not complete "
+                    "within 60 seconds"
+                ) from exc
+
+            raise Exception(
+                "Wizz Air apiUrl was not found within 60 seconds "
+                f"(title={driver.title!r}, url={driver.current_url!r})"
+            ) from exc
 
         html = driver.page_source
-
-        if "Human Verification" in html:
-            raise Exception("Blocked by Wizz Air / AWS WAF human verification")
 
         match = re.search(r'apiUrl\s*:\s*"([^"]+)"', html)
 
