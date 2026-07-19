@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 
-def find_matching_flights(outbound_flights, return_flights, day_span, max_price, airport_map):
+def find_matching_flights(outbound_flights, return_flights, day_span, max_price, airport_map, selected_months=None):
     results = []
 
     # Convert departureDate strings to datetime for comparison
@@ -13,6 +13,11 @@ def find_matching_flights(outbound_flights, return_flights, day_span, max_price,
         ret["departure_dt"] = ret_date
 
     for ob in outbound_flights:
+        # Month filtering is intentionally based only on the outbound leg and
+        # ignores the year (for example, July matches July 2026 and July 2027).
+        if selected_months and ob["departure_dt"].month not in selected_months:
+            continue
+
         for ret in return_flights:
             # Calculate day difference
             day_diff = (ret["departure_dt"].date() - ob["departure_dt"].date()).days

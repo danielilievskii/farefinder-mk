@@ -9,6 +9,7 @@ export const searchFlights = async (searchParams: SearchFormData) => {
   return apiClient<Flight[]>('/search-flights', {
     params: {
       destination_codes: searchParams.destinationCodes,
+      months: searchParams.months,
       duration: searchParams.duration,
       budget: searchParams.budget,
     }

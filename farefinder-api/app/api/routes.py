@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.models import Flight, Airport
@@ -56,9 +56,20 @@ def search_flights(
     destination_codes: str = Query(...),
     duration: int = Query(1),
     budget: Optional[float] = Query(None),
+    months: Optional[str] = Query(None, description="Comma-separated outbound month numbers (1-12)"),
     db: Session = Depends(get_db)
 ):
     all_matches = []
+
+    selected_months = None
+    if months:
+        try:
+            selected_months = {int(month) for month in months.split(",") if month.strip()}
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail="Months must be comma-separated numbers from 1 to 12") from exc
+
+        if not selected_months or any(month < 1 or month > 12 for month in selected_months):
+            raise HTTPException(status_code=422, detail="Months must be comma-separated numbers from 1 to 12")
 
     airport_map = get_airport_codes()
 
@@ -87,7 +98,8 @@ def search_flights(
             return_list,
             duration,
             budget,
-            airport_map
+            airport_map,
+            selected_months
         )
 
         all_matches.extend(matches)
