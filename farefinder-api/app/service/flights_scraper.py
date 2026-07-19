@@ -26,7 +26,9 @@ async def main():
     generated_dates = generate_two_month_ranges()
     all_flights_by_code = {}
 
-    base_url = get_base_url()
+    # Selenium is synchronous. Run it outside the event loop so the API can
+    # continue serving health checks while Chrome performs discovery.
+    base_url = await asyncio.to_thread(get_base_url)
 
     # Run all airports in parallel
     tasks = [

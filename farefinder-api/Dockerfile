@@ -31,4 +31,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["sh", "-c", "exec xvfb-run -a -s '-screen 0 1920x1080x24' uvicorn app.main:app --host 0.0.0.0 --port \"${PORT:-10000}\""]
+CMD ["sh", "-c", "Xvfb :99 -screen 0 1920x1080x24 -nolisten tcp -ac & export DISPLAY=:99; exec uvicorn app.main:app --host 0.0.0.0 --port \"${PORT:-10000}\""]

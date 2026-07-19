@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 from contextlib import asynccontextmanager
@@ -84,9 +85,6 @@ async def lifespan(app: FastAPI):
     load_airport_codes()
     load_nearby_airports()
 
-    logger.info("Running initial flight refresh...")
-    await scheduled_refresh_flights()
-
     scheduler.add_job(
         scheduled_refresh_flights,
         'cron',
@@ -95,10 +93,15 @@ async def lifespan(app: FastAPI):
     )
     scheduler.start()
 
+    logger.info("Starting initial flight refresh in the background...")
+    initial_refresh_task = asyncio.create_task(scheduled_refresh_flights())
+
     yield
 
     # Shutdown
     scheduler.shutdown()
+    if not initial_refresh_task.done():
+        initial_refresh_task.cancel()
 
 
 # Create FastAPI app
