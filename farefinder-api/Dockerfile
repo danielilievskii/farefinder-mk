@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     ca-certificates \
     fonts-dejavu \
+    xvfb \
+    xauth \
     && install -m 0755 -d /etc/apt/keyrings \
     && wget -q -O /etc/apt/keyrings/google-chrome.asc https://dl.google.com/linux/linux_signing_key.pub \
     && echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.asc] http://dl.google.com/linux/chrome/deb/ stable main" \
@@ -29,4 +31,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
+CMD ["sh", "-c", "exec xvfb-run -a -s '-screen 0 1920x1080x24' uvicorn app.main:app --host 0.0.0.0 --port \"${PORT:-10000}\""]
