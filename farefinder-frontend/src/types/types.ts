@@ -22,6 +22,7 @@ export interface Flight {
 
 export interface SearchFormData {
   destinationCodes: string[];
+  months: number[];
   duration: number;
   budget: number;
 }

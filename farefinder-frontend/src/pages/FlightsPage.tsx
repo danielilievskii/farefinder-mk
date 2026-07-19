@@ -17,6 +17,7 @@ const FlightsPage: React.FC = () => {
 
   const [searchFormData, setSearchFormData] = useState<SearchFormData>({
     destinationCodes: [],
+    months: Array.from({length: 12}, (_, index) => index + 1),
     duration: 1,
     budget: 4000,
   });
